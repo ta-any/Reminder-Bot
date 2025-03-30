@@ -110,7 +110,7 @@ async def add_kata(message):
         print('Message sent:', sent_msg.text)
 
         # Process the kata
-        asyncio.run(add_kata_on_name("valid-braces"))
+
 #         print('Kata processing result:', result)
 
 #         # Send result back to user
@@ -261,6 +261,8 @@ def daily_notification(chat_id):
 
 
 daily_notification(chat_id)
+
+asyncio.run(add_kata_on_name("Crazy programmer 01: find SuperMan", 'java'))
 
 # Запускаем бота
 print("Бот запущен!")
