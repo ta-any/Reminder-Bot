@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from telebot import formatting, types
 from contextlib import contextmanager
 from server.basedate.bd import random_kata, append_kata, change_status
+from server.repo import add_kata_on_name
 
 load_dotenv()
 TOKEN = os.getenv("API_KEY_BOT")  # Имя должно совпадать с .env
@@ -97,6 +98,27 @@ def start_command(message):
 
             user_data[user_id] = {"state": "no_account"}
 
+
+@bot.message_handler(commands=['add_kata'])
+async def add_kata(message):
+    try:
+        chat_id = message.chat.id
+        print("Info about chat:", chat_id)
+
+        # Send message and wait for response
+        sent_msg = await bot.send_message(chat_id, 'Сообщите название задачи или пришлите ссылку')
+        print('Message sent:', sent_msg.text)
+
+        # Process the kata
+        asyncio.run(add_kata_on_name("valid-braces"))
+#         print('Kata processing result:', result)
+
+#         # Send result back to user
+#         await bot.send_message(chat_id, f'Задача добавлена: {result}')
+
+    except Exception as e:
+        print(f"Error in add_kata: {e}")
+        await bot.send_message(chat_id, "Произошла ошибка при обработке запроса")
 
 def process_username(message):
     user_id = message.from_user.id

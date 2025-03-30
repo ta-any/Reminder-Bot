@@ -1,6 +1,7 @@
-import psycopg2, random
+import psycopg2, random, asyncio, time
 from psycopg2 import pool, sql, extras
 from contextlib import contextmanager
+from aiohttp import ClientSession
 
 from .config import DB_CONFIG
 print('DB_CONFIG', DB_CONFIG)
