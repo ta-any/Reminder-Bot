@@ -7,7 +7,7 @@ from .config import DB_CONFIG
 print('DB_CONFIG', DB_CONFIG)
 
 @contextmanager
-def postgres_connection(dbname, user, password, host):
+def postgres_connection(db_config):
     """
     Контекстный менеджер для подключения к PostgreSQL
     Автоматически закрывает соединение при выходе из контекста
@@ -15,10 +15,10 @@ def postgres_connection(dbname, user, password, host):
     conn = None
     try:
         conn = psycopg2.connect(
-            dbname=dbname,
-            user=user,
-            password=password,
-            host=host
+            dbname=db_config['name'],
+            user=db_config['user'],
+            password=db_config['password'],
+            host=db_config['host']
         )
         yield conn
     except psycopg2.DatabaseError as error:
@@ -45,7 +45,7 @@ def postgres_cursor(connection):
         if cursor is not None:
             cursor.close()
 
-def get_random_kate(db_config, method='unprepared'):
+def get_random_kate(method='unprepared'):
     """
     Получает случайную запись из указанной таблицы PostgreSQL
 
@@ -57,13 +57,9 @@ def get_random_kate(db_config, method='unprepared'):
         Случайную запись из таблицы или None, если таблица пуста
     """
 
+    db_config = DB_CONFIG
     try:
-        with postgres_connection(
-            dbname=db_config['name'],
-            user=db_config['user'],
-            password=db_config['password'],
-            host=db_config['host']
-        ) as conn:
+        with postgres_connection(db_config) as conn:
             with postgres_cursor(conn) as cur:
                 if method == 'unprepared':
 
@@ -97,12 +93,7 @@ def append_kata(kata):
     print("fn append_kata()")
     db_config = DB_CONFIG
     try:
-        with postgres_connection(
-                dbname=db_config['name'],
-                user=db_config['user'],
-                password=db_config['password'],
-                host=db_config['host']
-            ) as conn:
+        with postgres_connection(db_config) as conn:
                 with postgres_cursor(conn) as cur:
                     insert_query = sql.SQL("""
                         INSERT INTO {} (title, description, id_url, url, kyu, language)
@@ -142,12 +133,7 @@ def change_status(id, status):
     print("fn change_status()")
     db_config = DB_CONFIG
     try:
-        with postgres_connection(
-                dbname=db_config['name'],
-                user=db_config['user'],
-                password=db_config['password'],
-                host=db_config['host']
-            ) as conn:
+        with postgres_connection(db_config) as conn:
                 with postgres_cursor(conn) as cur:
                     insert_query = sql.SQL("""
                         UPDATE {}
@@ -169,7 +155,7 @@ def random_kata():
     """
     Получаем рандомный задачу из базы данных у котрой статус не готов (unprepared)
     """
-    optimized_record = get_random_kate(DB_CONFIG, method='unprepared')
+    optimized_record = get_random_kate(method='unprepared')
     print("KATA: ", optimized_record)
 
     return optimized_record

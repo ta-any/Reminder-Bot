@@ -79,6 +79,7 @@ def get_db_connection():
         if conn:
             connection_pool.putconn(conn)
 
+
 def create_table_if_not_exists():
     create_table_sql = """
         CREATE TABLE IF NOT EXISTS codewars_katas (
@@ -86,7 +87,7 @@ def create_table_if_not_exists():
             title VARCHAR(255) NOT NULL,
             id_url VARCHAR(255) UNIQUE NOT NULL,
             url VARCHAR(255) NOT NULL,
-            description VARCHAR(255),
+            description TEXT,
             kyu INTEGER NOT NULL,
             language VARCHAR(50) NOT NULL,
             status INTEGER DEFAULT 1,  -- Числовое значение вместо строки
