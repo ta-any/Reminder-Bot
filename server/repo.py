@@ -1,7 +1,7 @@
 import asyncio, re
 from asyncpg import Connection, Record
-from api.api import get_info_kata
-from basedate.bd import random_kata, append_kata, change_status
+from .api.api import get_info_kata
+from .basedate.bd import random_kata, append_kata, change_status
 
 def transform_string(input_str):
     transformed = input_str.replace('#', 'number')
