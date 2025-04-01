@@ -14,8 +14,11 @@ def transform_string(input_str):
 
 
 async def add_kata_on_name(name_kata, languages):
+    print('start')
     data = await get_info_kata(transform_string(name_kata))
     print("FROM REPO: ", data)
+
+    # TODO try/catch...
 
     rank_name = data.get('rank', {}).get('name', '')
     print("rank_name", rank_name)
