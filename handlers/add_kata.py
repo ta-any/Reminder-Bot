@@ -18,7 +18,7 @@ router = Router()
 class Kata(StatesGroup):
     name = State()
 
-@router.message(F.text, Command("add_kata"))
+@router.message(Command("add_kata"))
 async def cmd_add_kata(message: Message, state: FSMContext):
     await message.answer( "Сообщите название задачи или пришлите ссылку" )
     await state.set_state(Kata.name)
@@ -31,8 +31,14 @@ async def get_name(message: Message, state: FSMContext):
     print('-----------------------Kata.namekata--------------------------------------')
     print("NAME: ", name)
     result = await add_kata_on_name(name, 'python')
-    await message.answer(f"Ваш username Codewars: {name}")
 
+    if(result):
+        await message.answer(f"Ваша задача Codewars: {name}")
+    else:
+        await message.answer(f"Такой задачи не существует, попробуйте еще раз!")
+        return
+
+    await state.clear()
 
 
 

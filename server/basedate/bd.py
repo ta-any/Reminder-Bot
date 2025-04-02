@@ -76,7 +76,9 @@ async def append_kata(kata: Dict[str, Any]) -> Optional[int]:
     try:
         db_config = DB_CONFIG
         try:
+            print("start connect...")
             async with get_db_connection(db_config) as conn:
+                print("start circular: " )
                 # Выполняем запрос на вставку
                 query = f"""
                     INSERT INTO {db_config['main_table']}
@@ -99,9 +101,11 @@ async def append_kata(kata: Dict[str, Any]) -> Optional[int]:
 
                 print("finish")
                 return result['id'] if result else None
+        except:
+            print("ERROR...")
 
-        finally:
-            await conn.close()
+#         finally:
+#             await conn.close()
 
     except Exception as error:
         print(f"Database operation error: {error}")

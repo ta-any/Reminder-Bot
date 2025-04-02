@@ -1,6 +1,6 @@
 from aiogram import Router, F
 from aiogram.filters import Command
-from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.types import Message, ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton
 from aiogram import Bot, Dispatcher, types
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
@@ -12,6 +12,8 @@ import asyncio
 
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup  # For StatesGroup
+
+from server.repo import add_kata_on_name, c_in_c
 
 router = Router()  # [1]
 
@@ -29,10 +31,28 @@ class Form(StatesGroup):
 
 @router.message(Form.username)
 async def get_name(message: Message, state: FSMContext):
-    name = message.text.lower()
-    await message.answer(f"Ваш username Codewars: {name}")
+    name = message.text
+    if len(name) < 3:
+       await message.answer("Username слишком короткий. Попробуйте еще раз:")
+       return
 
-    await state.finish()
+    print("FROM GET_NAME: ", name)
+    result = await c_in_c(name)
+    if result:
+        await message.answer(f"Ваш username Codewars: {name}")
+        list_langs = create_keyboard_btn(result)
+
+        await message.answer(
+            text="Выберите язык:",
+            reply_markup=make_row_keyboard(list_langs)
+        )
+
+
+    else:
+        await message.answer("Username не существует. Попробуйте еще раз или давайте создадим аккаунт")
+        return
+
+    await state.clear()
 
 
 @router.callback_query(F.data == "has_account_yes")
@@ -41,6 +61,7 @@ async def send_random_value(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(Form.username)
 
     await callback.answer()
+
 
 @router.callback_query(F.data == "has_account_no")
 async def send_random_value(callback: types.CallbackQuery):
@@ -57,20 +78,28 @@ async def send_random_value(callback: types.CallbackQuery):
     )
     await callback.answer()
 
-#
-# @router.message(F.text.lower() == "has_account_yes")
-# async def answer_yes(message: Message):
-#     await message.answer(
-#         "Это здорово!",
-#         reply_markup=ReplyKeyboardRemove()
-#     )
-#
-# @router.message(F.text.lower() == "has_account_no")
-# async def answer_no(message: Message):
-#     await message.answer(
-#         "Жаль...",
-#         reply_markup=ReplyKeyboardRemove()
-#     )
+def make_row_keyboard(items: list[str]) -> ReplyKeyboardMarkup:
+    """
+    Создаёт реплай-клавиатуру с кнопками в один ряд
+    :param items: список текстов для кнопок
+    :return: объект реплай-клавиатуры
+    """
+    row = [KeyboardButton(text=item) for item in items]
+    return ReplyKeyboardMarkup(keyboard=[row], resize_keyboard=True)
+
+
+def create_keyboard_btn(user_data):
+    lst = list(user_data['ranks']['languages'])
+
+    if lst:
+        print("Список не пустой")
+        lst.append("Скрыть меню")
+    else:
+        print("Список пустой")
+        lst.extend(['python', 'javascript', 'rust', 'typescript', "Скрыть меню"])
+
+    return lst
+
 
 
 

@@ -1,6 +1,6 @@
 import asyncio, re
 from asyncpg import Connection, Record
-from .api.api import get_info_kata
+from .api.api import get_info_kata, check_in_codewars
 from .basedate.bd import random_kata, append_kata, change_status
 
 def transform_string(input_str):
@@ -15,36 +15,48 @@ def transform_string(input_str):
 
 async def add_kata_on_name(name_kata, languages):
     print('start')
-    data = await get_info_kata(transform_string(name_kata))
-    print("FROM REPO: ", data)
 
-    # TODO try/catch...
+    try:
+      data = await get_info_kata(transform_string(name_kata))
+      print("FROM REPO: ", data)
 
-    rank_name = data.get('rank', {}).get('name', '')
-    print("rank_name", rank_name)
-    number_part = rank_name.split()[0]
-    kyu = int(number_part)
+      if(data.get('success')):
+          return False
 
-    on_record = {
-        'title': data['name'],
-        'description': data['description'],
-        'id_url': data['id'],
-        'url': data['url'],
-        'kyu': kyu,
-        'language': languages
-    }
-    print("--------------------Данные для записи-------------------------")
-    print("Данные для записи: ", on_record)
-    await append_kata(on_record)
+      rank_name = data.get('rank', {}).get('name', '')
+      print("rank_name", rank_name)
+      number_part = rank_name.split()[0]
+      kyu = int(number_part)
 
-print("---------------------------------------------")
-# asyncio.run(add_kata_on_name('Scooby Doo Puzzle', 'python'))
+      on_record = {
+          'title': data['name'],
+          'description': data['description'],
+          'id_url': data['id'],
+          'url': data['url'],
+          'kyu': kyu,
+          'language': languages
+      }
+      print("--------------------Данные для записи-------------------------")
+      print("Данные для записи: ", on_record)
+      await append_kata(on_record)
+      return True
+
+    except:
+      print("An exception occurred")
+
+
 
 # print("---------------------------------------------")
-res = asyncio.run(random_kata())
-print("random_kata: ", res)
+# # asyncio.run(add_kata_on_name('Scooby Doo Puzzle', 'python'))
+#
+# # print("---------------------------------------------")
+# res = asyncio.run(random_kata())
+# print("random_kata: ", res)
 
 # res = asyncio.run(change_status(12, 3))
+
+async def c_in_c(user):
+    return await check_in_codewars(user)
 
 
 

@@ -73,24 +73,29 @@
 #     asyncio.run(main())
 
 
-import asyncio
+import asyncio, os
 import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command, CommandObject, CommandStart
 from aiogram.types import LinkPreviewOptions
-from config_reader import config
+# from config_reader import config
 from aiogram import F
 from aiogram.types import Message
 from aiogram.enums import ParseMode
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from dotenv import load_dotenv
+
+load_dotenv()
+TOKEN = os.getenv("BOT_TOKEN")
+chat_id = os.getenv("CHAT_ID")
 
 from handlers import questions, add_kata, different_types
 
 # Включаем логирование, чтобы не пропустить важные сообщения
 logging.basicConfig(level=logging.INFO)
 # Объект бота
-bot = Bot(token=config.bot_token.get_secret_value())
+bot = Bot(TOKEN)
 dp = Dispatcher()
 
 
@@ -99,7 +104,7 @@ async def main():
     dp.include_router(add_kata.router)
     dp.include_router(questions.router)
 
-    dp.include_router(different_types.router)
+#     dp.include_router(different_types.router)
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
