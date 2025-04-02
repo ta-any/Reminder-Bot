@@ -98,6 +98,8 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(TOKEN)
 dp = Dispatcher()
 
+from push.index import send_push_notification
+
 
 # Запуск бота
 async def main():
@@ -105,6 +107,8 @@ async def main():
     dp.include_router(questions.router)
 
 #     dp.include_router(different_types.router)
+
+    await send_push_notification(bot, chat_id)
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)

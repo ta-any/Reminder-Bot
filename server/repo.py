@@ -55,6 +55,11 @@ async def add_kata_on_name(name_kata, languages):
 
 # res = asyncio.run(change_status(12, 3))
 
+async def random_kata_by_day():
+    print("random_kata: ")
+    return await random_kata()
+
+
 async def c_in_c(user):
     return await check_in_codewars(user)
 
