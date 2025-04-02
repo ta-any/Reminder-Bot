@@ -153,3 +153,58 @@ async def random_kata():
     return optimized_record
 
 
+async def create_table_if_not_exists() -> None:
+    db_config = DB_CONFIG
+
+    create_table_sql = """
+        CREATE TABLE IF NOT EXISTS codewars_katas (
+            id SERIAL PRIMARY KEY,
+            title VARCHAR(255) NOT NULL,
+            id_url VARCHAR(255) UNIQUE NOT NULL,
+            url VARCHAR(255) NOT NULL,
+            description TEXT,
+            kyu INTEGER NOT NULL,
+            language VARCHAR(50) NOT NULL,
+            status INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    """
+    try:
+        async with get_db_connection(db_config) as conn:
+            async with conn.transaction():
+                await conn.execute(create_table_sql)
+                print("Таблица проверена/создана")
+    except Exception as e:
+        print(f"Ошибка при создании таблицы: {e}")
+
+async def insert_katas_batch(kata_list) -> None:
+    db_config = DB_CONFIG
+
+    if not kata_list:
+        print("Нет данных для вставки")
+        return
+
+    try:
+        async with get_db_connection(db_config) as conn:
+            async with conn.transaction():
+                insert_query = """
+                    INSERT INTO codewars_katas (title, id_url, url, kyu, language)
+                    VALUES ($1, $2, $3, $4, $5)
+                    ON CONFLICT (id_url) DO NOTHING
+                """
+
+                # Подготавливаем данные для вставки
+                data = [
+                    (kata['title'], kata['id_url'], kata['url'], kata['kyu'], kata['language'])
+                    for kata in kata_list
+                ]
+
+                # Выполняем пакетную вставку
+                await conn.executemany(insert_query, data)
+                print(f"Успешно вставлено {len(data)} записей")
+    except Exception as e:
+        print(f"Ошибка при вставке данных: {e}")
+
+
+
+

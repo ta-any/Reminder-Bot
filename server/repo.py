@@ -1,7 +1,8 @@
 import asyncio, re
 from asyncpg import Connection, Record
 from .api.api import get_info_kata, check_in_codewars
-from .basedate.bd import random_kata, append_kata, change_status
+from .basedate.bd import random_kata, append_kata, change_status, insert_katas_batch, create_table_if_not_exists
+from .api.parser import get_list_katas
 
 def transform_string(input_str):
     transformed = input_str.replace('#', 'number')
@@ -63,6 +64,17 @@ async def random_kata_by_day():
 async def c_in_c(user):
     return await check_in_codewars(user)
 
+
+async def parser_data(language, kyu, count):
+    data = await get_list_katas(language, kyu, count)
+    print("GET DATA FROM PARSER: ", data)
+
+    await create_table_if_not_exists()
+    await insert_katas_batch(data)
+
+
+if __name__ == "__main__":
+    asyncio.run(parser_data('python', 5, 100))
 
 
 

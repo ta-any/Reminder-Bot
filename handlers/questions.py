@@ -6,7 +6,7 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from keyboards.for_questions import get_yes_or_no
+from keyboards.for_questions import get_yes_or_no, create_keyboard_btn, make_row_keyboard
 from aiogram.types import LinkPreviewOptions
 import asyncio
 
@@ -28,6 +28,9 @@ async def cmd_start(message: Message):
 
 class Form(StatesGroup):
     username = State()
+    language = State()
+
+tmp = {}
 
 @router.message(Form.username)
 async def get_name(message: Message, state: FSMContext):
@@ -42,15 +45,34 @@ async def get_name(message: Message, state: FSMContext):
         await message.answer(f"Ваш username Codewars: {name}")
         list_langs = create_keyboard_btn(result)
 
+        # Сохраняем имя пользователя Codewars в состояние
+        await state.update_data(codewars_username=name)
+
         await message.answer(
             text="Выберите язык:",
             reply_markup=make_row_keyboard(list_langs)
         )
-
-
+        await state.set_state(Form.language)  # Устанавливаем состояние выбора языка
     else:
         await message.answer("Username не существует. Попробуйте еще раз или давайте создадим аккаунт")
         return
+
+    # Don't clear state here if you're transitioning to language selection
+    # await state.clear()
+
+
+@router.message(Form.language)
+async def process_language(message: Message, state: FSMContext):
+    # Получаем выбранный язык
+    selected_language = message.text
+
+    # Здесь можно добавить логику обработки выбранного языка
+    print(f"User selected language: {selected_language}")
+
+    await message.answer(
+        text=f"Вы выбрали язык: {selected_language}",
+        reply_markup=ReplyKeyboardRemove()  # Убираем клавиатуру
+    )
 
     await state.clear()
 
@@ -78,27 +100,7 @@ async def send_random_value(callback: types.CallbackQuery):
     )
     await callback.answer()
 
-def make_row_keyboard(items: list[str]) -> ReplyKeyboardMarkup:
-    """
-    Создаёт реплай-клавиатуру с кнопками в один ряд
-    :param items: список текстов для кнопок
-    :return: объект реплай-клавиатуры
-    """
-    row = [KeyboardButton(text=item) for item in items]
-    return ReplyKeyboardMarkup(keyboard=[row], resize_keyboard=True)
 
-
-def create_keyboard_btn(user_data):
-    lst = list(user_data['ranks']['languages'])
-
-    if lst:
-        print("Список не пустой")
-        lst.append("Скрыть меню")
-    else:
-        print("Список пустой")
-        lst.extend(['python', 'javascript', 'rust', 'typescript', "Скрыть меню"])
-
-    return lst
 
 
 

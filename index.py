@@ -108,7 +108,7 @@ async def main():
 
 #     dp.include_router(different_types.router)
 
-    await send_push_notification(bot, chat_id)
+#     await send_push_notification(bot, chat_id)
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
