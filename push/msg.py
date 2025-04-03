@@ -32,25 +32,23 @@ async def send_push_notification(bot, chat_id):
 
     await bot.send_message(chat_id=chat_id, text=f"Доброе утро! {name_kata} Ваша задача на сегодня!", link_preview_options=option_link)
     await asyncio.sleep(1)
-    await bot.send_message(chat_id=chat_id, text=body_kata)
+#     await bot.send_message(chat_id=chat_id, text=body_kata)
+#
+#     await bot.send_message(
+#         chat_id=chat_id,
+#         text="Готовы ее выполнить?",
+#         reply_markup=isDone()
+#     )
 
-    await bot.send_message(
-        chat_id=chat_id,
-        text="Готовы ее выполнить?",
-        reply_markup=isDone()
-    )
 
-    #TODO - продлить ветку с логикой!
-
-dp.include_router(router)
-
-@router.callback_query(F.data == "process")
-async def send_process_value(callback: types.CallbackQuery, state: FSMContext):
-    print('PROCESS....')
-    await callback.answer()
-    await callback.message.answer("Отлично!! =================")
-
-    await callback.answer()
+#
+# @router.callback_query(lambda c: c.data('process'))
+# async def handle_inline_button(callback_query: types.CallbackQuery):
+#     callback_data = callback_query.data
+#     print('PROCESS....')
+#     await callback.message.answer("Отлично!! =================")
+#
+#     await callback.answer()
 
 
 async def push_msg(bot, chat_id: int):
@@ -60,8 +58,8 @@ async def push_msg(bot, chat_id: int):
 #         now = datetime.now().timestamp()
 #         print("NOW: ", now)
 #         print("====================================")
-#         await send_push_notification(bot, chat_id)
-#         await asyncio.sleep(3900)
+# #         await send_push_notification(bot, chat_id)
+#         await asyncio.sleep(1)
 
 
 

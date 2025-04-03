@@ -1,77 +1,3 @@
-# import os, schedule, time, sys, asyncio, redis
-# from datetime import datetime, timedelta
-# from dotenv import load_dotenv
-#
-# from server.basedate.bd import random_kata, append_kata, change_status
-# from server.repo import add_kata_on_name
-#
-#
-# HOST = os.getenv('REDIS_HOST')
-# PORT = os.getenv('REDIS_PORT')
-# pool = redis.ConnectionPool(host = HOST, port = PORT, db=0)
-# r = redis.Redis(connection_pool=pool)
-#
-#
-# load_dotenv()
-# TOKEN = os.getenv("API_KEY_BOT")
-# chat_id = os.getenv("CHAT_ID")
-
-
-#
-# async def start():
-#     @bot.message_handler(commands=['start'])
-#     async def start(message):
-#         await bot.send_message(
-#                         message.chat.id,
-#                         "Доброе утро!")
-#         await asyncio.sleep(1)
-#         # Создаем inline-кнопки
-#         markup = types.InlineKeyboardMarkup()
-#         btn1 = types.InlineKeyboardButton("Да, есть аккаунт", callback_data="has_account")
-#         btn2 = types.InlineKeyboardButton("Нет, создать", callback_data="no_account")
-#         markup.add(btn1, btn2)
-#
-#         await bot.send_message(
-#             message.chat.id,
-#             "Есть ли аккаунт Codewars?",
-#             reply_markup=markup
-#         )
-#
-#         user_data = {}
-#         user_data[user_id] = {"state": "waiting_account_info"}
-#         print('user_data', user_data)
-#
-#     @bot.callback_query_handler(func=lambda call: call.data in ["has_account", "no_account"])
-#     async def callback_handler(call):
-#         chat_id = call.message.chat.id
-#         user_id = call.from_user.id
-#         if call.data == "has_account":
-#             print("BTH: has_account")
-#             await bot.answer_callback_query(call.id, "has_account!!")
-#             msg = await bot.send_message(call.message.chat.id, "Отлично! Введите ваш username Codewars!")
-#
-#             await bot.register_next_step_handler(call.message, process_username)
-#
-#         elif call.data == "no_account":
-#             await bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=None)
-#             await bot.send_message(chat_id, 'Давайте создадим аккаунт: https://www.codewars.com/')
-#             user_data[user_id] = {"state": "no_account"}
-#
-#     async def process_username(message):
-#         username = message.text
-#         await bot.send_message(message.chat.id, f"Ваш username Codewars: {username}")
-#
-#
-#
-#
-# async def main():
-#     await start()
-#     print("Бот запущен")
-#     await bot.polling()
-#
-# if __name__ == '__main__':
-#     asyncio.run(main())
-
 import threading
 from threading import Thread
 from datetime import datetime
@@ -115,8 +41,7 @@ async def main():
     dp.include_router(questions.router)
     dp.include_router(different_types.router)
 
-
-    # Создаем отдельный поток для push-уведомлений
+#     # Создаем отдельный поток для push-уведомлений
 #     loop = asyncio.new_event_loop()
 #     thread = threading.Thread(
 #         target=run_async_in_thread,
@@ -126,11 +51,16 @@ async def main():
 #     thread.start()
 #     while True:
 #         await asyncio.sleep(1)
+    await push_msg(bot, chat_id)
     await dp.start_polling(bot)
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     # Запускаем бота
+
     print("Бот запущен!")
     asyncio.run(main())
+
+
+
 

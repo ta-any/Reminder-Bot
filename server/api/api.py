@@ -11,13 +11,11 @@ async def get_info(name_kata):
             return kata
 
 
-
 async def get_info_kata(name_kata):
     result =  await get_info(name_kata)
     print("from fn get_info_kata", result)
 
     return result
-
 
 async def check_in_codewars(user):
     url = f"https://www.codewars.com/api/v1/users/{user}"
@@ -31,11 +29,9 @@ async def check_in_codewars(user):
                 if response.status == 200:
                     print("Успешный запрос!")
                     data = await response.json()
-#                     user_data[user_id]['body'] = data
-                    print("-------------------------------------")
-#                     print(user_data[user_id]['body'])
+
+                    print("------------------data-------------------")
                     print(data)
-                    print("-------------------------------------")
                     return data
                 else:
                     print(f"Ошибка запроса. Статус код: {response.status}")

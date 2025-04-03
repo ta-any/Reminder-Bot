@@ -7,7 +7,6 @@ from typing import Optional, Dict, Any
 from .config import DB_CONFIG
 # print('DB_CONFIG', DB_CONFIG)
 
-
 @asynccontextmanager
 async def get_db_connection(db_config):
     conn = await asyncpg.connect(
@@ -21,8 +20,6 @@ async def get_db_connection(db_config):
         yield conn
     finally:
         await conn.close()
-
-
 
 async def get_random_kate(method: str = 'unprepared') -> Optional[Dict[str, Any]]:
     """
@@ -193,13 +190,11 @@ async def insert_katas_batch(kata_list) -> None:
                     ON CONFLICT (id_url) DO NOTHING
                 """
 
-                # Подготавливаем данные для вставки
                 data = [
                     (kata['title'], kata['id_url'], kata['url'], kata['kyu'], kata['language'])
                     for kata in kata_list
                 ]
 
-                # Выполняем пакетную вставку
                 await conn.executemany(insert_query, data)
                 print(f"Успешно вставлено {len(data)} записей")
     except Exception as e:

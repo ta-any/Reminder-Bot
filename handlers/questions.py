@@ -57,7 +57,7 @@ async def get_name(message: Message, state: FSMContext):
             text="Выберите язык:",
             reply_markup=make_row_keyboard(list_langs)
         )
-        await state.set_state(Form.language)  # Устанавливаем состояние выбора языка
+        await state.set_state(Form.language)
     else:
         await message.answer("Username не существует. Попробуйте еще раз или давайте создадим аккаунт")
         return
@@ -65,15 +65,12 @@ async def get_name(message: Message, state: FSMContext):
 
 @router.message(Form.language)
 async def process_language(message: Message, state: FSMContext):
-    # Получаем выбранный язык
     selected_language = message.text
-
-    # Здесь можно добавить логику обработки выбранного языка
     print(f"User selected language: {selected_language}")
 
     await message.answer(
         text=f"Вы выбрали язык: {selected_language}",
-        reply_markup=ReplyKeyboardRemove()  # Убираем клавиатуру
+        reply_markup=ReplyKeyboardRemove()
     )
 
     await state.clear()
@@ -105,7 +102,6 @@ async def send_random_value(callback: types.CallbackQuery):
 
 @router.callback_query(lambda c: c.data.startswith('confirm_') or c.data == 'confirm_Скрыть меню')
 async def handle_inline_button(callback_query: types.CallbackQuery):
-    # Получаем callback_data
     callback_data = callback_query.data
 
     if callback_data == 'confirm_Скрыть меню':
@@ -139,7 +135,6 @@ async def handle_inline_button(callback_query: types.CallbackQuery):
 
 @router.callback_query(lambda c: c.data.startswith('level_'))
 async def handle_inline_button(callback_query: types.CallbackQuery):
-    # Получаем callback_data
     callback_data = callback_query.data
 
     selected_level = callback_data.split('_')[1]
