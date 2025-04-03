@@ -15,14 +15,32 @@ def get_yes_or_no() -> ReplyKeyboardMarkup:
 
     return builder.as_markup()
 
-def make_row_keyboard(items: list[str]) -> ReplyKeyboardMarkup:
+def isDone() -> ReplyKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    builder.add(
+        InlineKeyboardButton(text="Сделаю!", callback_data="process"),
+        InlineKeyboardButton(text="Хочу другую!", callback_data="other_kata")
+    )
+
+    return builder.as_markup()
+
+def make_row_keyboard(items: list[str]) -> InlineKeyboardMarkup:
     """
-    Создаёт реплай-клавиатуру с кнопками в один ряд
+    Создаёт inline-клавиатуру с кнопками в один ряд
     :param items: список текстов для кнопок
-    :return: объект реплай-клавиатуры
+    :return: объект inline-клавиатуры
     """
-    row = [KeyboardButton(text=item) for item in items]
-    return ReplyKeyboardMarkup(keyboard=[row], resize_keyboard=True)
+    row = [InlineKeyboardButton(text=item, callback_data=f"confirm_{item}") for item in items]
+    return InlineKeyboardMarkup(inline_keyboard=[row])
+
+def make_row_keyboard_level(items: list[str]) -> InlineKeyboardMarkup:
+    """
+    Создаёт inline-клавиатуру с кнопками в один ряд
+    :param items: список текстов для кнопок
+    :return: объект inline-клавиатуры
+    """
+    row = [InlineKeyboardButton(text=item, callback_data=f"level_{item}") for item in items]
+    return InlineKeyboardMarkup(inline_keyboard=[row])
 
 
 def create_keyboard_btn(user_data):

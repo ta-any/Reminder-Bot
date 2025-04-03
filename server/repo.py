@@ -45,16 +45,13 @@ async def add_kata_on_name(name_kata, languages):
     except:
       print("An exception occurred")
 
+async def get_info_kata_body(name_kata):
+    print('-------------------------get_info_kata---------------------------')
+    data = await get_info_kata(transform_string(name_kata))
+    print(data)
 
+    return data
 
-# print("---------------------------------------------")
-# # asyncio.run(add_kata_on_name('Scooby Doo Puzzle', 'python'))
-#
-# # print("---------------------------------------------")
-# res = asyncio.run(random_kata())
-# print("random_kata: ", res)
-
-# res = asyncio.run(change_status(12, 3))
 
 async def random_kata_by_day():
     print("random_kata: ")
@@ -73,8 +70,8 @@ async def parser_data(language, kyu, count):
     await insert_katas_batch(data)
 
 
-if __name__ == "__main__":
-    asyncio.run(parser_data('python', 5, 100))
+# if __name__ == "__main__":
+#     asyncio.run(parser_data('python', 5, 100))
 
 
 

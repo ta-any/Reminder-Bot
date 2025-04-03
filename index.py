@@ -100,58 +100,37 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(TOKEN)
 dp = Dispatcher()
 
-from push.index import send_push_notification, push_msg
-
-
-
-# async def main():
-#     dp.include_router(add_kata.router)
-#     dp.include_router(questions.router)
-# #     dp.include_router(different_types.router)
-#
-# #     await send_push_notification(bot, chat_id)
-#
-#      while True:
-#         await asyncio.sleep(1)
-#
-#
-#     await bot.delete_webhook(drop_pending_updates=True)
-#     await dp.start_polling(bot)
-#
-#
-# if __name__ == "__main__":
-#
-#     # Запускаем проверку напоминаний в отдельном потоке
-#     reminder_thread = threading.Thread(target=push_msg)
-#     reminder_thread.daemon = True
-#     reminder_thread.start()
-#
-#     # Запускаем бота
-#     print("Бот запущен!")
-#     asyncio.run(main())
+from push.msg import send_push_notification, push_msg
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup  # For StatesGroup
+from aiogram.fsm.storage.memory import MemoryStorage
 
 def run_async_in_thread(loop, coro):
     asyncio.set_event_loop(loop)
     loop.run_until_complete(coro)
 
 async def main():
+    print('TEST')
     dp.include_router(add_kata.router)
     dp.include_router(questions.router)
-    #     dp.include_router(different_types.router)
+    dp.include_router(different_types.router)
+
 
     # Создаем отдельный поток для push-уведомлений
-    loop = asyncio.new_event_loop()
-    thread = threading.Thread(
-        target=run_async_in_thread,
-        args=(loop, push_msg(bot, chat_id))
-    )
-    thread.daemon = True
-    thread.start()
-    while True:
-        await asyncio.sleep(1)  # example async operation
+#     loop = asyncio.new_event_loop()
+#     thread = threading.Thread(
+#         target=run_async_in_thread,
+#         args=(loop, push_msg(bot, chat_id))
+#     )
+#     thread.daemon = True
+#     thread.start()
+#     while True:
+#         await asyncio.sleep(1)
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
 
     # Запускаем бота
     print("Бот запущен!")
     asyncio.run(main())
+
