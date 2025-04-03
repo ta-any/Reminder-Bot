@@ -72,8 +72,10 @@
 # if __name__ == '__main__':
 #     asyncio.run(main())
 
-
-import asyncio, os
+import threading
+from threading import Thread
+from datetime import datetime
+import asyncio, os, time
 import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command, CommandObject, CommandStart
@@ -98,21 +100,58 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(TOKEN)
 dp = Dispatcher()
 
-from push.index import send_push_notification
+from push.index import send_push_notification, push_msg
 
 
-# Запуск бота
+
+# async def main():
+#     dp.include_router(add_kata.router)
+#     dp.include_router(questions.router)
+# #     dp.include_router(different_types.router)
+#
+# #     await send_push_notification(bot, chat_id)
+#
+#      while True:
+#         await asyncio.sleep(1)
+#
+#
+#     await bot.delete_webhook(drop_pending_updates=True)
+#     await dp.start_polling(bot)
+#
+#
+# if __name__ == "__main__":
+#
+#     # Запускаем проверку напоминаний в отдельном потоке
+#     reminder_thread = threading.Thread(target=push_msg)
+#     reminder_thread.daemon = True
+#     reminder_thread.start()
+#
+#     # Запускаем бота
+#     print("Бот запущен!")
+#     asyncio.run(main())
+
+def run_async_in_thread(loop, coro):
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(coro)
+
 async def main():
     dp.include_router(add_kata.router)
     dp.include_router(questions.router)
+    #     dp.include_router(different_types.router)
 
-#     dp.include_router(different_types.router)
-
-#     await send_push_notification(bot, chat_id)
-
-    await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot)
-
+    # Создаем отдельный поток для push-уведомлений
+    loop = asyncio.new_event_loop()
+    thread = threading.Thread(
+        target=run_async_in_thread,
+        args=(loop, push_msg(bot, chat_id))
+    )
+    thread.daemon = True
+    thread.start()
+    while True:
+        await asyncio.sleep(1)  # example async operation
 
 if __name__ == "__main__":
+
+    # Запускаем бота
+    print("Бот запущен!")
     asyncio.run(main())
