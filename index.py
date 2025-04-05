@@ -51,7 +51,7 @@ async def main():
 #     thread.start()
 #     while True:
 #         await asyncio.sleep(1)
-    await push_msg(bot, chat_id)
+#     await push_msg(bot, chat_id)
     await dp.start_polling(bot)
 
 

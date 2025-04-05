@@ -33,7 +33,7 @@ async def get_name(message: Message, state: FSMContext):
     result = await add_kata_on_name(name, 'python')
 
     if(result):
-        await message.answer(f"Ваша задача Codewars: {name}")
+        await message.answer(f"Ваша задача добавленна!")
     else:
         await message.answer(f"Такой задачи не существует, попробуйте еще раз!")
         return

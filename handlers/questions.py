@@ -30,6 +30,7 @@ async def cmd_start(message: Message):
 class Form(StatesGroup):
     username = State()
     language = State()
+    count = State()
 
 tmp_config_filter = {}
 
@@ -134,7 +135,7 @@ async def handle_inline_button(callback_query: types.CallbackQuery):
 
 
 @router.callback_query(lambda c: c.data.startswith('level_'))
-async def handle_inline_button(callback_query: types.CallbackQuery):
+async def handle_inline_button(callback_query: types.CallbackQuery, state: FSMContext):
     callback_data = callback_query.data
 
     selected_level = callback_data.split('_')[1]
@@ -149,17 +150,41 @@ async def handle_inline_button(callback_query: types.CallbackQuery):
     await callback_query.message.edit_text(
         f"Подтверждено: {selected_level}"
     )
-    await callback_query.message.answer( text="Это может занять время" )
-    await get_base(tmp_config_filter['language'], tmp_config_filter['level'], 100)
-
     await callback_query.message.answer(
-        text="Успешно!"
+        text=f"Сколько задач хотите решить?"
     )
 
     await callback_query.answer()
-#     await state.clear()
+    await state.set_state(Form.count)
+
+
+@router.message(Form.count)
+async def respons_count(message: Message, state: FSMContext):
+    num = message.text
+    print(f"User selected count: {num}")
+    await message.answer(
+        text=f"Вы выбрали количество задач: {num}",
+        reply_markup=ReplyKeyboardRemove()
+    )
+
+    await state.update_data(codewars_count=num)
+    tmp_config_filter['count'] = int(num)
+
+    await message.answer(text="Это может занять время")
+    answer_text = await get_base(tmp_config_filter['language'], tmp_config_filter['level'], tmp_config_filter['count'])
+    await message.answer(text=answer_text)
+
+    await state.clear()
+
 
 async def get_base(language, kyu, count):
-    await parser_data(language, kyu, count)
+    result = await parser_data(language, kyu, count)
+    print(result)
+
+    if int(result) > 0:
+        return f"Успешно вставленно {result}!"
+    else:
+        return "Ошибка записи данных! Попробуй еще раз!"
+
 
 

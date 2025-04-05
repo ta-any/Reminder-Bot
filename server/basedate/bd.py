@@ -197,6 +197,7 @@ async def insert_katas_batch(kata_list) -> None:
 
                 await conn.executemany(insert_query, data)
                 print(f"Успешно вставлено {len(data)} записей")
+                return len(data)
     except Exception as e:
         print(f"Ошибка при вставке данных: {e}")
 

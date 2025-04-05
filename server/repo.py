@@ -67,7 +67,7 @@ async def parser_data(language, kyu, count):
     print("GET DATA FROM PARSER: ", data)
 
     await create_table_if_not_exists()
-    await insert_katas_batch(data)
+    return await insert_katas_batch(data)
 
 
 # if __name__ == "__main__":

@@ -2,10 +2,6 @@ from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, R
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 
-
-# from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
-# from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardRemove
-
 def get_yes_or_no() -> ReplyKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.add(
