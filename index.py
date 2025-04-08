@@ -13,6 +13,7 @@ from aiogram.enums import ParseMode
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from dotenv import load_dotenv
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 load_dotenv()
 TOKEN = os.getenv("BOT_TOKEN")
@@ -31,27 +32,26 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup  # For StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 
-def run_async_in_thread(loop, coro):
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(coro)
+async def async_wrapper():
+    await push_msg(bot, chat_id)
 
 async def main():
-    print('TEST')
+    print('Start...')
     dp.include_router(add_kata.router)
     dp.include_router(questions.router)
     dp.include_router(different_types.router)
 
-#     # Создаем отдельный поток для push-уведомлений
-#     loop = asyncio.new_event_loop()
-#     thread = threading.Thread(
-#         target=run_async_in_thread,
-#         args=(loop, push_msg(bot, chat_id))
-#     )
-#     thread.daemon = True
-#     thread.start()
-#     while True:
-#         await asyncio.sleep(1)
-#     await push_msg(bot, chat_id)
+    loop = asyncio.get_running_loop()
+
+#     ToDo time custom
+    scheduler = AsyncIOScheduler(event_loop=loop)
+    scheduler.add_job(async_wrapper,
+                        'cron',
+                        hour=9,
+                        minute=5,
+                        misfire_grace_time=40)
+    scheduler.start()
+
     await dp.start_polling(bot)
 
 

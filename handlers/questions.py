@@ -16,7 +16,6 @@ from aiogram.fsm.state import State, StatesGroup  # For StatesGroup
 from server.repo import add_kata_on_name, c_in_c, parser_data
 
 router = Router()  # [1]
-
 @router.message(Command("start"))  # [2]
 async def cmd_start(message: Message):
     print('Start')
