@@ -25,41 +25,17 @@ async def send_push_notification(bot, chat_id):
         url=f'{link}',
         prefer_small_media=True
     )
-    name_kata = res['title'] or "Задача без названия"  # Запасной вариант
+    name_kata = res['title'] or "Задача без названия"
     data = await get_info_kata_body(name_kata)
-    body_kata = res['description'] or "Описание задачи отсутствует"  # Запасной вариант
-
+    body_kata = res['description'] or "Описание задачи отсутствует"
 
     await bot.send_message(chat_id=chat_id, text=f"Доброе утро! {name_kata} Ваша задача на сегодня!", link_preview_options=option_link)
     await asyncio.sleep(1)
-#     await bot.send_message(chat_id=chat_id, text=body_kata)
-#
-#     await bot.send_message(
-#         chat_id=chat_id,
-#         text="Готовы ее выполнить?",
-#         reply_markup=isDone()
-#     )
-
-
-#
-# @router.callback_query(lambda c: c.data('process'))
-# async def handle_inline_button(callback_query: types.CallbackQuery):
-#     callback_data = callback_query.data
-#     print('PROCESS....')
-#     await callback.message.answer("Отлично!! =================")
-#
-#     await callback.answer()
 
 
 async def push_msg(bot, chat_id: int):
     await send_push_notification(bot, chat_id)
-#     while True:
-#         # Получаем текущее время
-#         now = datetime.now().timestamp()
-#         print("NOW: ", now)
-#         print("====================================")
-# #         await send_push_notification(bot, chat_id)
-#         await asyncio.sleep(1)
+
 
 
 

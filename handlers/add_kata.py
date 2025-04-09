@@ -11,7 +11,7 @@ from aiogram.types import LinkPreviewOptions
 import asyncio
 
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup  # For StatesGroup
+from aiogram.fsm.state import State, StatesGroup
 from server.repo import add_kata_on_name
 
 router = Router()
