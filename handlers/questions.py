@@ -1,14 +1,15 @@
+import asyncio
 from aiogram import Router, F
 from aiogram.filters import Command
-from aiogram.types import Message, ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton
 from aiogram import Bot, Dispatcher, types
+from aiogram.types import Message, LinkPreviewOptions, ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton
+#  LinkPreviewOptions
+
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from keyboards.for_questions import get_yes_or_no, make_row_keyboard_level, create_keyboard_btn, make_row_keyboard
-from aiogram.types import LinkPreviewOptions
-import asyncio
 
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup  # For StatesGroup
@@ -96,7 +97,7 @@ async def send_random_value(callback: types.CallbackQuery):
     await callback.message.answer(
         f"Регистрация \n{links_text}",
         link_preview_options=option_link
-    )
+    ) # link_preview_options=option_link
     await callback.answer()
 
 

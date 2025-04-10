@@ -12,6 +12,14 @@ services:
       - "${DB_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+#      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql  # Для инициализации БД
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   bot:
     build: .
@@ -26,6 +34,12 @@ services:
       - POSTGRES_DB=${DB_NAME}
     depends_on:
       - postgres
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

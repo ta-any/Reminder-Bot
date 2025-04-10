@@ -16,7 +16,8 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(TOKEN)
 dp = Dispatcher()
 
-
+async def text_task():
+    print("Text")  # или любая другая асинхронная операция
 
 async def async_wrapper():
     await push_msg(bot, chat_id)
@@ -33,10 +34,14 @@ async def main():
     scheduler = AsyncIOScheduler(event_loop=loop)
     scheduler.add_job(async_wrapper,
                         'cron',
-                        hour=16,
-                        minute=49,
+                        hour=6,
+                        minute=17,
                         misfire_grace_time=40)
+
     scheduler.start()
+
+    logging.basicConfig()
+    logging.getLogger('apscheduler').setLevel(logging.DEBUG)
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
