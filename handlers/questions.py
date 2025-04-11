@@ -12,14 +12,19 @@ from server.repo import add_kata_on_name, c_in_c, parser_data
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-inside_data = {}
+from server.services import data_service
+data_service.data = {}
+
+print("++++++++++++++++++++++++++++++++++")
+logger.info('data_service: ', data_service.data)
+
 
 router = Router()
 @router.message(Command("start"))
 async def cmd_start(message: Message):
     logger.info(' Start command "/start"')
-    if inside_data:
-        await message.answer( f"Hi {inside_data['current_name']}!" )
+    if data_service.data:
+        await message.answer( f"Hi {data_service.data['current_name']}!" )
     else:
         await message.answer( "Welcome!" )
         await asyncio.sleep(1.3)
@@ -53,7 +58,7 @@ async def get_name(message: Message, state: FSMContext):
         logger.info(f"{list_langs}")
 
         # Сохраняем имя пользователя Codewars в состояние
-        inside_data['current_name'] = name
+        data_service.data['current_name'] = name
         await state.update_data(codewars_username=name)
 
         await message.answer(
@@ -172,10 +177,11 @@ async def respons_count(message: Message, state: FSMContext):
     await state.update_data(codewars_count=num)
     tmp_config_filter['count'] = int(num)
 
-    await message.answer(text="Это может занять время")
+    temp_msg = await message.answer(text="Это может занять время")
     answer_text = await get_base(tmp_config_filter['language'], tmp_config_filter['level'], tmp_config_filter['count'])
     await message.answer(text=answer_text)
 
+    await temp_msg.delete()
     await state.clear()
 
 
