@@ -28,7 +28,6 @@ async def cmd_start(message: Message):
             reply_markup=get_yes_or_no()
         )
 
-
 class Form(StatesGroup):
     username = State()
     language = State()
@@ -182,10 +181,13 @@ async def respons_count(message: Message, state: FSMContext):
 
 async def get_base(language, kyu, count):
     result = await parser_data(language, kyu, count)
-    print(result)
+    logger.info(f"Успешно сохранено {result}!")
+    number = int(result)
 
-    if int(result) > 0:
-        return f"Успешно вставленно {result}!"
+    if number == count:
+        return f"Успешно! Все сохранено!"
+    elif number > 0:
+        return f"Что-то пошло не так и сохранено только {result}!"
     else:
         return "Ошибка записи данных! Попробуй еще раз!"
 
