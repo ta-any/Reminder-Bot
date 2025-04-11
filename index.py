@@ -8,7 +8,7 @@ load_dotenv()
 TOKEN = os.getenv("BOT_TOKEN")
 chat_id = os.getenv("CHAT_ID")
 
-from handlers import questions, add_kata, different_types
+from handlers import questions, add_kata, different_types, random_kata
 from push.msg import send_push_notification, push_msg
 
 logging.basicConfig(level=logging.INFO)
@@ -26,6 +26,7 @@ async def main():
     print('Start...')
     dp.include_router(add_kata.router)
     dp.include_router(questions.router)
+    dp.include_router(random_kata.router)
     dp.include_router(different_types.router)
 
     loop = asyncio.get_running_loop()

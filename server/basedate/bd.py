@@ -4,6 +4,10 @@ from contextlib import contextmanager, asynccontextmanager
 from asyncpg import Connection, Record
 from typing import Optional, Dict, Any
 
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 from .config import DB_CONFIG
 # print('DB_CONFIG', DB_CONFIG)
 
@@ -33,6 +37,7 @@ async def get_random_kate(method: str = 'unprepared') -> Optional[Dict[str, Any]
     try:
         db_config = DB_CONFIG
         try:
+            logger.info("Start get_random_kate...")
             if method == 'unprepared':
                 async with get_db_connection(db_config) as conn:
                     query = f"""
@@ -56,7 +61,7 @@ async def get_random_kate(method: str = 'unprepared') -> Optional[Dict[str, Any]
             await conn.close()
 
     except Exception as error:
-        print(f"Database operation error: {error}")
+        logger.error(f"Database operation error: {error}")
         return None
 
 
@@ -68,14 +73,15 @@ async def append_kata(kata: Dict[str, Any]) -> Optional[int]:
     Возвращает:
         ID добавленной записи или None, если произошла ошибка или запись уже существовала
     """
-    print("async append_kata()")
+    logger.info("async append_kata()")
 
     try:
         db_config = DB_CONFIG
         try:
-            print("start connect...")
+
+            logger.info("start append_kata connect...")
             async with get_db_connection(db_config) as conn:
-                print("start circular: " )
+                logger.info("start circular: " )
                 # Выполняем запрос на вставку
                 query = f"""
                     INSERT INTO {db_config['main_table']}
@@ -96,16 +102,16 @@ async def append_kata(kata: Dict[str, Any]) -> Optional[int]:
                     kata['language']
                 )
 
-                print("finish")
+                logger.info("finish")
                 return result['id'] if result else None
         except:
-            print("ERROR...")
+            logger.error("ERROR...")
 
 #         finally:
 #             await conn.close()
 
     except Exception as error:
-        print(f"Database operation error: {error}")
+        logger.error(f"Database operation error: {error}")
         return None
 
 
@@ -118,10 +124,11 @@ async def change_status(id, status):
         status: Новый статус
         pool: Пул соединений asyncpg
     """
-    print(f"fn change_status(), ID kata: {id}")
+    logger.info(f"fn change_status(), ID kata: {id}")
 
     db_config = DB_CONFIG
     try:
+        logger.info("Start change_status...")
         async with get_db_connection(db_config) as conn:
             async with conn.transaction():
                await conn.execute(
@@ -133,10 +140,10 @@ async def change_status(id, status):
                     status, id
                 )
 
-            print("Status updated successfully")
+            logger.info("Status updated successfully")
 
     except psycopg2.DatabaseError as error:
-        print(f"Database operation error: {error}")
+        logger.error(f"Database operation error: {error}")
         return None
 
 
@@ -145,7 +152,7 @@ async def random_kata():
     Получаем рандомный задачу из базы данных у котрой статус не готов (unprepared)
     """
     optimized_record = await get_random_kate(method='unprepared')
-    print("KATA: ", optimized_record)
+    logger.info(f"KATA: {optimized_record}")
 
     return optimized_record
 
@@ -167,21 +174,23 @@ async def create_table_if_not_exists() -> None:
         );
     """
     try:
+        logger.info("Start create_table_if_not_exists...")
         async with get_db_connection(db_config) as conn:
             async with conn.transaction():
                 await conn.execute(create_table_sql)
-                print("Таблица проверена/создана")
+                logger.info("Таблица проверена/создана")
     except Exception as e:
-        print(f"Ошибка при создании таблицы: {e}")
+        logger.error(f"Ошибка при создании таблицы: {e}")
 
 async def insert_katas_batch(kata_list) -> None:
     db_config = DB_CONFIG
 
     if not kata_list:
-        print("Нет данных для вставки")
+        logger.info("Нет данных для вставки")
         return
 
     try:
+        logger.info("Start insert_katas_batch...")
         async with get_db_connection(db_config) as conn:
             async with conn.transaction():
                 insert_query = """
@@ -196,11 +205,46 @@ async def insert_katas_batch(kata_list) -> None:
                 ]
 
                 await conn.executemany(insert_query, data)
-                print(f"Успешно вставлено {len(data)} записей")
+                logger.info(f"Успешно вставлено {len(data)} записей")
+
                 return len(data)
     except Exception as e:
-        print(f"Ошибка при вставке данных: {e}")
+        logger.error(f"Ошибка при вставке данных: {e}")
 
+async def delay_kata(ID_kata: int) -> bool | None:
+    """
+    Удаляет запись из базы данных по указанному ID.
+
+    Args:
+        db_config: Конфигурация базы данных (параметры подключения)
+        record_id: ID записи для удаления
+        table_name: Имя таблицы, из которой нужно удалить запись
+
+    Returns:
+        bool: True если запись была удалена, False если записи с таким ID не существует
+    """
+
+    try:
+        db_config = DB_CONFIG
+        logger.info("Start config BD...")
+        try:
+            logger.info("Start get_db_connection...")
+            async with get_db_connection(db_config) as conn:
+                query = f"DELETE FROM  {db_config['main_table']} WHERE id = $1 RETURNING id;"
+                deleted_record = await conn.fetchrow(query, ID_kata)
+
+                return deleted_record is not None
+
+            return None
+
+        finally:
+#             await conn.close()
+            logger.info("Stop get_db_connection...")
+
+
+    except Exception as error:
+        logger.error(f"Database operation error: {error}")
+        return None
 
 
 
