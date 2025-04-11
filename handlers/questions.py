@@ -1,31 +1,33 @@
-import asyncio
-from aiogram import Router, F
+import asyncio, logging
+from aiogram import Router, F, Bot, Dispatcher, types
 from aiogram.filters import Command
-from aiogram import Bot, Dispatcher, types
 from aiogram.types import Message, LinkPreviewOptions, ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton
-#  LinkPreviewOptions
-
-
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
 
 from keyboards.for_questions import get_yes_or_no, make_row_keyboard_level, create_keyboard_btn, make_row_keyboard
-
-from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup  # For StatesGroup
-
 from server.repo import add_kata_on_name, c_in_c, parser_data
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-router = Router()  # [1]
-@router.message(Command("start"))  # [2]
+inside_data = {}
+
+router = Router()
+@router.message(Command("start"))
 async def cmd_start(message: Message):
-    print('Start')
-    await message.answer( "Welcome!" )
-    await asyncio.sleep(1.3)
-    await message.answer(
-        "Есть ли аккаунт Codewars?",
-        reply_markup=get_yes_or_no()
-    )
+    logger.info(' Start command "/start"')
+    if inside_data:
+        await message.answer( f"Hi {inside_data['current_name']}!" )
+    else:
+        await message.answer( "Welcome!" )
+        await asyncio.sleep(1.3)
+        await message.answer(
+            "Есть ли аккаунт Codewars?",
+            reply_markup=get_yes_or_no()
+        )
+
 
 class Form(StatesGroup):
     username = State()
@@ -42,16 +44,17 @@ async def get_name(message: Message, state: FSMContext):
        await message.answer("Username слишком короткий. Попробуйте еще раз:")
        return
 
-    print("FROM GET_NAME: ", name)
+    logger.info(f"FROM GET_NAME: {name}")
     result = await c_in_c(name)
-    print("========================result=================================")
-    print(result)
+    logger.info("========================result=================================")
+    logger.info(f"{logger.info}")
     if result:
         await message.answer(f"Ваш username Codewars: {name}")
         list_langs = create_keyboard_btn(result)
-        print(list_langs)
+        logger.info(f"{list_langs}")
 
         # Сохраняем имя пользователя Codewars в состояние
+        inside_data['current_name'] = name
         await state.update_data(codewars_username=name)
 
         await message.answer(
@@ -67,7 +70,7 @@ async def get_name(message: Message, state: FSMContext):
 @router.message(Form.language)
 async def process_language(message: Message, state: FSMContext):
     selected_language = message.text
-    print(f"User selected language: {selected_language}")
+    logger.info(f"User selected language: {selected_language}")
 
     await message.answer(
         text=f"Вы выбрали язык: {selected_language}",
