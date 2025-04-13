@@ -1,7 +1,7 @@
 import asyncio, re
 from asyncpg import Connection, Record
 from .api.api import get_info_kata, check_in_codewars
-from .basedate.bd import delay_kata, random_kata, append_kata, change_status, insert_katas_batch, create_table_if_not_exists
+from .basedate.bd import delay_kata, random_kata, append_kata, change_status, insert_katas_batch, create_table_if_not_exists, change_status
 from .api.parser import get_list_katas
 
 import logging
@@ -17,6 +17,15 @@ def transform_string(input_str):
 
     return transformed
 
+async def kata_in_progress(id):
+    logger.info(f"Start fn kata_in_progress... ")
+    await change_status(id, 2)
+    logger.info(f"Finish fn kata_in_progress... ")
+
+async def stop_kata(id):
+    logger.info(f"Start fn stop_kata... ")
+    await change_status(id, 4)
+    logger.info(f"Finish fn stop_kata... ")
 
 async def add_kata_on_name(name_kata, languages):
     print('start')

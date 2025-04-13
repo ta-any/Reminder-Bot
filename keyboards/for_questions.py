@@ -1,6 +1,15 @@
 from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
+def get_yon() -> ReplyKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    builder.add(
+        InlineKeyboardButton(text="Подходит!", callback_data="yes"),
+        InlineKeyboardButton(text="Давай другую", callback_data="no")
+    )
+
+    return builder.as_markup()
+
 
 def get_yes_or_no() -> ReplyKeyboardMarkup:
     builder = InlineKeyboardBuilder()

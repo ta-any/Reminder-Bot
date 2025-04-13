@@ -247,4 +247,34 @@ async def delay_kata(ID_kata: int) -> bool | None:
         return None
 
 
+async def return_to_service():
+    """
+    Асинхронно изменяет статус всех задач сл статусом
+    4(негодится) на 1(ожидает) в базе данных
+
+    """
+    logger.info(f"fn return_to_service()")
+    db_config = DB_CONFIG
+    try:
+        logger.info("Start return_to_service...")
+        async with get_db_connection(db_config) as conn:
+            async with conn.transaction():
+               await conn.execute(
+                    f"""
+                    UPDATE {db_config['main_table']}
+                    SET status = 1
+                    WHERE status = 4
+                    """
+                )
+
+            logger.info("Status updated successfully")
+
+    except psycopg2.DatabaseError as error:
+        logger.error(f"Database operation error: {error}")
+        return None
+
+# if __name__ == "__main__":
+#     print('FROM BD-file')
+#     logger.info("Start return_to_service...")
+#     asyncio.run(return_to_service())
 
