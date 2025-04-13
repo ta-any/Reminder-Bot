@@ -14,6 +14,8 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from keyboards.for_questions import isDone
 
+from handlers import random_kata
+
 dp = Dispatcher()
 router = Router()
 
@@ -31,6 +33,7 @@ async def send_push_notification(bot, chat_id):
 
     await bot.send_message(chat_id=chat_id, text=f"Доброе утро! {name_kata} Ваша задача на сегодня!", link_preview_options=option_link)
     await asyncio.sleep(1)
+
 
 
 async def push_msg(bot, chat_id: int):

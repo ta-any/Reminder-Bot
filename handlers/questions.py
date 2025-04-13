@@ -104,7 +104,7 @@ async def send_random_value(callback: types.CallbackQuery):
     await callback.message.answer(
         f"Регистрация \n{links_text}",
         link_preview_options=option_link
-    ) # link_preview_options=option_link
+    )
     await callback.answer()
 
 
@@ -164,7 +164,6 @@ async def handle_inline_button(callback_query: types.CallbackQuery, state: FSMCo
     await callback_query.answer()
     await state.set_state(Form.count)
 
-
 @router.message(Form.count)
 async def respons_count(message: Message, state: FSMContext):
     num = message.text
@@ -177,7 +176,7 @@ async def respons_count(message: Message, state: FSMContext):
     await state.update_data(codewars_count=num)
     tmp_config_filter['count'] = int(num)
 
-    temp_msg = await message.answer(text="Это может занять время")
+    temp_msg = await message.answer(text="Это может занять время...")
     answer_text = await get_base(tmp_config_filter['language'], tmp_config_filter['level'], tmp_config_filter['count'])
     await message.answer(text=answer_text)
 
